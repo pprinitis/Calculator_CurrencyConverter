@@ -20,29 +20,24 @@ class CurrencyRepositoryImplementation(
 
 ) : CurrencyRepository {
     override fun getCurrencyRatesList(): Flow<Resource<List<CurrencyRate>>> = flow {
-        Log.d("newRates", "1")
         val localCurrencyRates = getLocalCurrencyRates()
-        Log.d("newRates", "2")
         emit(Resource.Success(localCurrencyRates))
-        Log.d("newRates", "3")
 
         try {
             val newRates = getRemoteCurrencyRates()
             updateLocalCurrencyRates(newRates)
             emit(Resource.Success(newRates))
         } catch (e: IOException) {
-            Log.d("Server responce", "${e.message}")
             emit(
                 Resource.Error(
-                    message = "${e.message}",
+                    message = "Check your internet connection",
                     data = localCurrencyRates
                 )
             )
         } catch (e: Exception) {
-            Log.d("Server responce2", "${e.message}")
             emit(
                 Resource.Error(
-                    message = "Something went wrong ${e.message}",
+                    message = "Something went wrong ",
                     data = localCurrencyRates
 
                 )
@@ -56,7 +51,6 @@ class CurrencyRepositoryImplementation(
 
     private suspend fun getRemoteCurrencyRates(): List<CurrencyRate> {
         val response = api.getLatestRates()
-        Log.d("Server responce", "${response}")
         return response.toCurrencyRate()
     }
 
